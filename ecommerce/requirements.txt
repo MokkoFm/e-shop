@@ -1,0 +1,3 @@
+Django==3.0.8
+mysqlclient @ file:///C:/Users/mokko/Desktop/mysqlclient-1.4.6-cp38-
+environs==8.0.0
