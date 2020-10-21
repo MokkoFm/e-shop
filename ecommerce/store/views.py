@@ -2,9 +2,18 @@ from django.shortcuts import render
 from .models import Product, Order, OrderItem
 from django.http import JsonResponse
 import json
+from django.db.models import Q
 
 
 def store(request):
+    search = request.GET.get('search', '')
+    if search:
+        products = Product.objects.filter(Q(name__icontains=search) | Q(description__icontains=search))
+    else:
+        products = Product.objects.raw(
+        'SELECT id, name, description, price FROM store_product')
+
+
     if request.user.is_authenticated:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, is_complete=False)
@@ -15,8 +24,6 @@ def store(request):
         order = {'cart_total': 0, 'cart_items_amount': 0}
         cart_items_amount = order['cart_items_amount']
 
-    products = Product.objects.raw(
-        'SELECT id, name, description, price FROM store_product')
     context = {'products': products, 'cart_items_amount': cart_items_amount}
     return render(request, "store.html", context)
 
