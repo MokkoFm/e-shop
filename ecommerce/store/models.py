@@ -1,18 +1,20 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
 
 
 class Customer(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
-    username = models.CharField(max_length=50)
     phonenumber = models.CharField(max_length=20, blank=True)
     email = models.CharField(max_length=100, blank=True)
     address = models.CharField(max_length=200)
+    user = models.OneToOneField(
+        User, blank=True, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return self.username
+        return f"{self.firstname} {self.lastname}"
 
     class Meta:
         verbose_name = "customer"
@@ -65,10 +67,18 @@ class Order(models.Model):
         default=timezone.now, verbose_name='registration time of order')
     is_complete = models.BooleanField(
         default=False, db_index=True, verbose_name="status")
-    transition_id = models.CharField(max_length=100, null=True)
+    transaction_id = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return f" Order number - {self.id}"
+
+    @property
+    def cart_total(self):
+        return sum([item.total for item in self.order_items.all()])
+
+    @property
+    def cart_items_amount(self):
+        return sum([item.quantity for item in self.order_items.all()])
 
     class Meta:
         verbose_name = 'order'
@@ -88,6 +98,10 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product}: {self.quantity}"
+
+    @property
+    def total(self):
+        return self.product.price * self.quantity
 
     class Meta:
         verbose_name = "order item"
