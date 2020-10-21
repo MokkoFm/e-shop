@@ -44,6 +44,14 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def image_url(self):
+        try:
+            url = self.image.url
+        except:
+            url = ''
+        return url
+
     class Meta:
         verbose_name = 'product'
         verbose_name_plural = 'products'
