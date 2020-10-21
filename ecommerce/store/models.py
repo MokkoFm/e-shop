@@ -94,7 +94,7 @@ class OrderItem(models.Model):
         related_name='order_items', verbose_name='order_items')
     quantity = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(25)],
-        verbose_name='quantity')
+        verbose_name='quantity', default=0)
 
     def __str__(self):
         return f"{self.product}: {self.quantity}"
