@@ -1,7 +1,7 @@
 # E-commerce Shop
 
 Template of pizza shop, where you can add products to order, use search, add more products by admin panel.
-[Web-site](https://) of the project.
+[Web-site](https://elsakov91.pythonanywhere.com/) of the project.
 
 ## Installation
 
