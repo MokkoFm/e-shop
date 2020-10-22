@@ -8,7 +8,8 @@ from django.db.models import Q
 def store(request):
     search = request.GET.get('search', '')
     if search:
-        products = Product.objects.filter(Q(name__icontains=search) | Q(description__icontains=search))
+        products = Product.objects.filter(
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(id=search))
     else:
         products = Product.objects.raw(
         'SELECT id, name, description, price FROM store_product')
