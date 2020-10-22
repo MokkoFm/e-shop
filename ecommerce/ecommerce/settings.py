@@ -18,9 +18,6 @@ SECRET_KEY = env("SECRET_KEY", "mokko2070")
 DEBUG = env.bool("DEBUG", False)
 
 ALLOWED_HOSTS = []
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
 
 CACHES = {
     'default': {
@@ -84,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'store',
         'USER': 'root',
-        'PASSWORD': 'sergeI0502!',
+        'PASSWORD': env('PASSWORD'),
         'HOST': 'localhost'
     }
 }
