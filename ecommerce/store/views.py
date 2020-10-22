@@ -18,6 +18,9 @@ def store(request):
     elif search and order_by == 'Name':
         products = Product.objects.filter(
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('name')
+    elif search and order_by == 'Order by':
+        products = Product.objects.filter(
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search))
     else:
         products = Product.objects.raw(
         'SELECT id, name, description, price FROM store_product')
