@@ -7,9 +7,17 @@ from django.db.models import Q
 
 def store(request):
     search = request.GET.get('search', '')
-    if search:
+    order_by = request.GET.get('order_by')
+    by_price = request.GET.get('price', '')
+    if search and order_by == 'Price':
         products = Product.objects.filter(
-            Q(name__icontains=search) | Q(description__icontains=search) | Q(id=search))
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('price')
+    elif search and order_by == 'Id':
+        products = Product.objects.filter(
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('id')
+    elif search and order_by == 'Name':
+        products = Product.objects.filter(
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('name')
     else:
         products = Product.objects.raw(
         'SELECT id, name, description, price FROM store_product')

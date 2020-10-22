@@ -47,6 +47,12 @@
                 <form class="form-inline my-2 my-lg-0" action="{% url 'store' %}">
                     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="search">
                     <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    <select name="order_by" class='form-control ml-2'>
+                        <option selected="selected">Order by</option>
+                        <option>Name</option>
+                        <option>Id</option>
+                        <option name="price">Price</option>
+                    </select>
                 </form>
               </li>
           </ul>
