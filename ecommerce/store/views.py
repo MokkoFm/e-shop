@@ -8,13 +8,39 @@ from django.db.models import Q
 def get_context(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, is_complete=False)
-        items = order.order_items.all()
+        order, created = Order.objects.prefetch_related('order_items').get_or_create(customer=customer, is_complete=False)
+        items = order.order_items.select_related('product').all()
         cart_items_amount = order.cart_items_amount
     else:
+        try:
+            cart = json.loads(request.COOKIES['cart'])
+        except:
+            cart = {}
+            print('CART:', cart)
         items = []
         order = {'cart_total': 0, 'cart_items_amount': 0}
         cart_items_amount = order['cart_items_amount']
+        for item in cart:
+            cart_items_amount += cart[item]['quantity']
+            product = Product.objects.get(id=item)
+            total = product.price * cart[item]['quantity']
+            order['cart_total'] += total
+            order['cart_items_amount'] += cart[item]['quantity']
+
+            item = {
+                'product': {
+                    'id': product.id,
+                    'name': product.name,
+                    'price': product.price,
+                    'image_url': product.image_url,
+                    'category': product.category,
+                    'description': product.description
+                },
+                'quantity': cart[item]['quantity'],
+                'total': total,
+            }
+            items.append(item)
+
 
     context = {'items': items, 'order': order, 'cart_items_amount': cart_items_amount}
     return context
