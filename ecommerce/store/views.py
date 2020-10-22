@@ -69,14 +69,9 @@ def update_item(request):
     data = json.loads(request.body)
     product_id = data['productId']
     action = data['action']
-    print('Action:', action)
-    print('Product_id:', product_id)
 
     customer = request.user.customer
     product = Product.objects.get(id=product_id)
-    #product = Product.objects.raw(
-     #   'SELECT * FROM store_product WHERE store_product.id = %s',
-      #  [product_id])
     order, created = Order.objects.get_or_create(
         customer=customer, is_complete=False)
     orderItem, created = OrderItem.objects.get_or_create(
