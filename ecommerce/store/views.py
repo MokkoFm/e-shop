@@ -6,6 +6,7 @@ from django.db.models import Q
 
 
 def store(request):
+    g = OrderItem.objects.select_related('product', 'order')
     search = request.GET.get('search', '')
     order_by = request.GET.get('order_by')
     by_price = request.GET.get('price', '')
@@ -23,7 +24,7 @@ def store(request):
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search))
     else:
         products = Product.objects.raw(
-        'SELECT id, name, description, price FROM store_product')
+        'SELECT id, name, description, price, image FROM store_product')
 
 
     if request.user.is_authenticated:
