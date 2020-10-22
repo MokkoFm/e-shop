@@ -22,6 +22,13 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'my_cache_table',
+    }
+}
+
 
 # Application definition
 

@@ -3,8 +3,10 @@ from .models import Product, Order, OrderItem
 from django.http import JsonResponse
 import json
 from django.db.models import Q
+from django.views.decorators.cache import cache_page
 
 
+@cache_page(60 * 15)
 def store(request):
     g = OrderItem.objects.select_related('product', 'order')
     search = request.GET.get('search', '')
