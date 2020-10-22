@@ -15,9 +15,9 @@ print(BASE_DIR)
 SECRET_KEY = env("SECRET_KEY", "mokko2070")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
