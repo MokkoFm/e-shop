@@ -38,7 +38,7 @@ python manage.py runserver
 
 Create superuser with command:
 ```
-python manage.py create superuser
+python manage.py createsuperuser
 ```
 
 Link to the admin panel: `http://127.0.0.1:8000/admin/`. 
