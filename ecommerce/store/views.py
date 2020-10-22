@@ -3,15 +3,26 @@ from .models import Product, Order, OrderItem
 from django.http import JsonResponse
 import json
 from django.db.models import Q
-from django.views.decorators.cache import cache_page
 
 
-@cache_page(60 * 15)
+def get_context(request):
+    if request.user.is_authenticated:
+        customer = request.user.customer
+        order, created = Order.objects.get_or_create(customer=customer, is_complete=False)
+        items = order.order_items.all()
+        cart_items_amount = order.cart_items_amount
+    else:
+        items = []
+        order = {'cart_total': 0, 'cart_items_amount': 0}
+        cart_items_amount = order['cart_items_amount']
+
+    context = {'items': items, 'order': order, 'cart_items_amount': cart_items_amount}
+    return context
+
+
 def store(request):
-    g = OrderItem.objects.select_related('product', 'order')
     search = request.GET.get('search', '')
     order_by = request.GET.get('order_by')
-    by_price = request.GET.get('price', '')
     if search and order_by == 'Price':
         products = Product.objects.filter(
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('price')
@@ -28,34 +39,9 @@ def store(request):
         products = Product.objects.raw(
         'SELECT id, name, description, price, image FROM store_product')
 
-
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, is_complete=False)
-        items = order.order_items.all()
-        cart_items_amount = order.cart_items_amount
-    else:
-        items = []
-        order = {'cart_total': 0, 'cart_items_amount': 0}
-        cart_items_amount = order['cart_items_amount']
-
-    context = {'products': products, 'cart_items_amount': cart_items_amount}
+    context = get_context(request)
+    context['products'] = products
     return render(request, "store.html", context)
-
-
-def get_context(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, is_complete=False)
-        items = order.order_items.all()
-        cart_items_amount = order.cart_items_amount
-    else:
-        items = []
-        order = {'cart_total': 0, 'cart_items_amount': 0}
-        cart_items_amount = order['cart_items_amount']
-
-    context = {'items': items, 'order': order, 'cart_items_amount': cart_items_amount}
-    return context
 
 
 def cart(request):
