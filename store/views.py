@@ -50,25 +50,34 @@ def get_context(request):
     return context
 
 
-def store(request):
+def get_products(request):
     search = request.GET.get('search', '')
     order_by = request.GET.get('order_by', '')
     if search and order_by == 'Price' or order_by == 'Price':
         products = Product.objects.filter(
-            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('price')
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(
+                id__icontains=search)).order_by('price')
     elif search and order_by == 'Id' or order_by == 'Id':
         products = Product.objects.filter(
-            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('id')
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(
+                id__icontains=search)).order_by('id')
     elif search and order_by == 'Name' or order_by == 'Name':
         products = Product.objects.filter(
-            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('name')
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(
+                id__icontains=search)).order_by('name')
     elif search and order_by == 'Order by':
         products = Product.objects.filter(
-            Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search))
+            Q(name__icontains=search) | Q(description__icontains=search) | Q(
+                id__icontains=search))
     else:
         products = Product.objects.raw(
             'SELECT id, name, description, price, image FROM store_product')
 
+    return products
+
+
+def store(request):
+    products = get_products(request)
     context = get_context(request)
     context['products'] = products
     return render(request, "store.html", context)
