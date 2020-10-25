@@ -3,12 +3,14 @@ from .models import Product, Order, OrderItem
 from django.http import JsonResponse
 import json
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 
 def get_context(request):
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.prefetch_related('order_items').get_or_create(customer=customer, is_complete=False)
+        order, created = Order.objects.prefetch_related(
+            'order_items').get_or_create(customer=customer, is_complete=False)
         items = order.order_items.select_related('product').all()
         cart_items_amount = order.cart_items_amount
     else:
@@ -16,13 +18,13 @@ def get_context(request):
             cart = json.loads(request.COOKIES['cart'])
         except:
             cart = {}
-            print('CART:', cart)
+
         items = []
         order = {'cart_total': 0, 'cart_items_amount': 0}
         cart_items_amount = order['cart_items_amount']
         for item in cart:
             cart_items_amount += cart[item]['quantity']
-            product = Product.objects.get(id=item)
+            product = get_object_or_404(Product, id=item)
             total = product.price * cart[item]['quantity']
             order['cart_total'] += total
             order['cart_items_amount'] += cart[item]['quantity']
@@ -41,21 +43,23 @@ def get_context(request):
             }
             items.append(item)
 
-
-    context = {'items': items, 'order': order, 'cart_items_amount': cart_items_amount}
+    context = {
+        'items': items,
+        'order': order,
+        'cart_items_amount': cart_items_amount}
     return context
 
 
 def store(request):
     search = request.GET.get('search', '')
-    order_by = request.GET.get('order_by')
-    if search and order_by == 'Price':
+    order_by = request.GET.get('order_by', '')
+    if search and order_by == 'Price' or order_by == 'Price':
         products = Product.objects.filter(
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('price')
-    elif search and order_by == 'Id':
+    elif search and order_by == 'Id' or order_by == 'Id':
         products = Product.objects.filter(
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('id')
-    elif search and order_by == 'Name':
+    elif search and order_by == 'Name' or order_by == 'Name':
         products = Product.objects.filter(
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search)).order_by('name')
     elif search and order_by == 'Order by':
@@ -63,7 +67,7 @@ def store(request):
             Q(name__icontains=search) | Q(description__icontains=search) | Q(id__icontains=search))
     else:
         products = Product.objects.raw(
-        'SELECT id, name, description, price, image FROM store_product')
+            'SELECT id, name, description, price, image FROM store_product')
 
     context = get_context(request)
     context['products'] = products
@@ -86,19 +90,19 @@ def update_item(request):
     action = data['action']
 
     customer = request.user.customer
-    product = Product.objects.get(id=product_id)
+    product = get_object_or_404(Product, id=product_id)
     order, created = Order.objects.get_or_create(
         customer=customer, is_complete=False)
-    orderItem, created = OrderItem.objects.get_or_create(
+    order_item, created = OrderItem.objects.get_or_create(
         order=order, product=product)
 
     if action == 'add':
-        orderItem.quantity = (orderItem.quantity + 1)
+        order_item.quantity = (order_item.quantity + 1)
     elif action == 'remove':
-        orderItem.quantity = (orderItem.quantity - 1)
+        order_item.quantity = (order_item.quantity - 1)
 
-    orderItem.save()
-    if orderItem.quantity <= 0:
-        orderItem.delete()
+    order_item.save()
+    if order_item.quantity <= 0:
+        order_item.delete()
 
     return JsonResponse('Item was added', safe=False)
