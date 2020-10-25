@@ -1,4 +1,3 @@
-from pathlib import Path
 import os
 from environs import Env
 env = Env()

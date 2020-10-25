@@ -16,7 +16,7 @@ def get_context(request):
     else:
         try:
             cart = json.loads(request.COOKIES['cart'])
-        except:
+        except ValueError:
             cart = {}
 
         items = []

@@ -50,7 +50,7 @@ class Product(models.Model):
     def image_url(self):
         try:
             url = self.image.url
-        except:
+        except AttributeError:
             url = ''
         return url
 
