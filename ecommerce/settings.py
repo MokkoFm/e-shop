@@ -13,9 +13,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = env("SECRET_KEY", "mokko2070")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", False)
+DEBUG = True
 
 ALLOWED_HOSTS = []
+INTERNAL_IPS = ('127.0.0.1', '192.168.0.1',)
 
 # Application definition
 
